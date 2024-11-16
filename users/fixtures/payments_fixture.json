@@ -1,0 +1,117 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$216000$uHj6yUib0x7X$...",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "user1@example.com",
+      "phone": "1234567890",
+      "city": "City1",
+      "avatar": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-10-01T00:00:00Z",
+      "first_name": "User",
+      "last_name": "One",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$216000$abc123$...",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "user2@example.com",
+      "phone": "0987654321",
+      "city": "City2",
+      "avatar": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-10-02T00:00:00Z",
+      "first_name": "User",
+      "last_name": "Two",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 1,
+    "fields": {
+      "name": "Курс 1",
+      "preview": "",
+      "description": "Описание курса 1"
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 2,
+    "fields": {
+      "name": "Курс 2",
+      "preview": "",
+      "description": "Описание курса 2"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 1,
+    "fields": {
+      "course": 1,
+      "name": "Урок 1",
+      "description": "Описание урока 1",
+      "preview": "",
+      "video_link": "http://example.com/video1"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 2,
+    "fields": {
+      "course": 1,
+      "name": "Урок 2",
+      "description": "Описание урока 2",
+      "preview": "",
+      "video_link": "http://example.com/video2"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 3,
+    "fields": {
+      "course": 2,
+      "name": "Урок 3",
+      "description": "Описание урока 3",
+      "preview": "",
+      "video_link": "http://example.com/video3"
+    }
+  },
+  {
+    "model": "users.payment",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "payment_date": "2023-10-10T10:00:00Z",
+      "paid_course": 1,
+      "paid_lesson": null,
+      "amount": "100.00",
+      "payment_method": "cash"
+    }
+  },
+  {
+    "model": "users.payment",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "payment_date": "2023-10-11T11:00:00Z",
+      "paid_course": null,
+      "paid_lesson": 2,
+      "amount": "50.00",
+      "payment_method": "bank_transfer"
+    }
+  }
+]
