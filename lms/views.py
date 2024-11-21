@@ -1,8 +1,12 @@
-from rest_framework import viewsets,generics
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from users.permissions import IsModerator, IsOwner
-from .models import Course,Lesson
+from .models import Course, Lesson, Subscription
+from .paginators import CoursePagination, LessonPagination
 from .serializers import CourseSerializer, LessonSerializer
 
 class LessonListCreateView(generics.ListCreateAPIView):
@@ -17,6 +21,8 @@ class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CoursePagination
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -24,23 +30,28 @@ class CourseViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [IsAuthenticated, ~IsModerator]
-        elif self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
+        elif self.action in ['update', 'partial_update', 'destroy']:
             permission_classes = [IsAuthenticated, IsOwner | IsModerator]
+        elif self.action == 'retrieve':
+            permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    # Убираем метод get_queryset или оставляем его без фильтрации
     def get_queryset(self):
-        user = self.request.user
-        if user.groups.filter(name='Moderators').exists():
-            return Course.objects.all()
-        else:
-            return Course.objects.filter(owner=user)
+        return Course.objects.all()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    pagination_class = LessonPagination
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -61,3 +72,21 @@ class LessonViewSet(viewsets.ModelViewSet):
         else:
             return Lesson.objects.filter(owner=user)
 
+
+class SubscriptionAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        course_id = request.data.get('course_id')
+        if not course_id:
+            return Response({"error": "course_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        course = get_object_or_404(Course, id=course_id)
+        subscription, created = Subscription.objects.get_or_create(user=user, course=course)
+        if not created:
+            # Подписка уже существует, удаляем ее
+            subscription.delete()
+            message = 'Подписка удалена'
+        else:
+            message = 'Подписка добавлена'
+        return Response({"message": message})
