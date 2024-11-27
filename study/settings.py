@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django_filters',
     'users',
     'lms',
-    'django_extensions'
+    'django_extensions',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')

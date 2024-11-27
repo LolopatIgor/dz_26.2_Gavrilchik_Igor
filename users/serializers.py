@@ -5,7 +5,8 @@ from lms.serializers import CourseSerializer, LessonSerializer
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = '__all__'
+        fields = ['id', 'user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method', 'payment_url']
+        read_only_fields = ['id', 'user', 'payment_date', 'payment_url']
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -25,3 +26,5 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar')
+
+
