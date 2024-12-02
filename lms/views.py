@@ -3,7 +3,7 @@ from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from tasks import send_course_update_notification
 from users.permissions import IsModerator, IsOwner
 from .models import Course, Lesson, Subscription
 from .paginators import CoursePagination, LessonPagination
@@ -38,14 +38,28 @@ class CourseViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    # Убираем метод get_queryset или оставляем его без фильтрации
-    def get_queryset(self):
-        return Course.objects.all()
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        course = self.get_object()
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({"request": self.request})
-        return context
+        # Получаем подписчиков курса
+        subscriptions = course.subscription_set.all()
+        for subscription in subscriptions:
+            send_course_update_notification.delay(course.id, subscription.user.email)
+
+        return response
+
+    def partial_update(self, request, *args, **kwargs):
+        response = super().partial_update(request, *args, **kwargs)
+        course = self.get_object()
+
+        # Получаем подписчиков курса
+        subscriptions = course.subscription_set.all()
+        for subscription in subscriptions:
+            send_course_update_notification.delay(course.id, subscription.user.email)
+
+        return response
+
 
 
 class LessonViewSet(viewsets.ModelViewSet):
