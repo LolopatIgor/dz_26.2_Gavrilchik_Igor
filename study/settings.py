@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'users',
     'lms',
     'django_extensions',
-    'drf_yasg'
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
